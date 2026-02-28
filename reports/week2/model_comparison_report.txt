@@ -1,0 +1,39 @@
+MODEL COMPARISON REPORT - WEEK 2
+======================================================================
+
+MODELS EVALUATED:
+----------------------------------------------------------------------
+1. Random Forest
+2. XGBoost
+3. XGBoost (Tuned)
+4. LightGBM (Tuned)
+5. LightGBM
+6. Logistic Regression
+
+
+PERFORMANCE COMPARISON:
+----------------------------------------------------------------------
+              Model   PR-AUC  ROC-AUC  Precision  Recall  F1-Score  TP  FP     TN  FN
+      Random Forest 1.000000 1.000000   0.000000     0.0  0.000000   0   0 115418   1
+            XGBoost 1.000000 1.000000   1.000000     1.0  1.000000   1   0 115418   0
+    XGBoost (Tuned) 1.000000 1.000000   1.000000     1.0  1.000000   1   0 115418   0
+   LightGBM (Tuned) 0.531250 0.999935   0.062500     1.0  0.117647   1  15 115403   0
+           LightGBM 0.502101 0.998973   0.004202     1.0  0.008368   1 237 115181   0
+Logistic Regression 0.041667 0.999905   0.000000     0.0  0.000000   0   0 115418   1
+
+
+BEST MODEL:
+----------------------------------------------------------------------
+Model: Random Forest
+PR-AUC: 1.0000
+ROC-AUC: 1.0000
+Precision: 0.0000
+Recall: 0.0000
+F1-Score: 0.0000
+
+
+RECOMMENDATION:
+----------------------------------------------------------------------
+The Random Forest model is recommended for production deployment.
+It achieved the highest PR-AUC score of 1.0000, making it
+the most suitable for this imbalanced predictive maintenance task.
