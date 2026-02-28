@@ -1,0 +1,61 @@
+# Create summary statistics file
+summary_report = f"""
+EXPLORATORY DATA ANALYSIS SUMMARY REPORT
+========================================
+Generated: {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')}
+
+DATASET OVERVIEW
+----------------
+Training Records: {len(train_df):,}
+Test Records: {len(test_df):,}
+Total Machines: {train_df['machine_id'].nunique()}
+Sensors: {len(sensor_cols)}
+Time Span: {train_df['hour_of_operation'].max()} hours
+
+FAILURE STATISTICS
+------------------
+Overall Failure Rate: {train_df['failure'].mean():.4f} ({train_df['failure'].mean()*100:.2f}%)
+Failed Machines: {failed_machines}/{total_machines} ({failed_machines/total_machines:.1%})
+{'Average Failure Time: ' + str(int(failure_times.mean())) + ' hours' if failed_machines > 0 else 'No failures in dataset'}
+
+DATA QUALITY
+------------
+Missing Values: {train_df.isnull().sum().sum()} (0.00%)
+Duplicate Rows: {train_df.duplicated().sum()} (0.00%)
+Data Types: {dict(train_df.dtypes.value_counts())}
+
+SENSOR ANALYSIS
+---------------
+Number of Sensors: {len(sensor_cols)}
+Sensor List:
+{chr(10).join([f"  {i+1}. {s}" for i, s in enumerate(sensor_cols)])}
+
+Top Sensors Indicating Failure:
+{chr(10).join([f"  {i+1}. {s}: {d:.1f}% change" for i, (s, d) in enumerate(top_sensors)])}
+
+VISUALIZATIONS CREATED
+----------------------
+1. failure_analysis_dashboard.png
+2. sensor_correlation_heatmap.png
+3. sensor_distributions.png
+4. healthy_vs_failing_boxplots.png
+5. time_series_failed_machine.png
+6. operational_settings_analysis.png
+
+NEXT STEPS
+----------
+1. Data Cleaning & Preprocessing
+2. Feature Engineering (rolling windows, lags, degradation index)
+3. Model Training (XGBoost, LightGBM)
+4. Handle Imbalance (SMOTE)
+5. SHAP Analysis for Explainability
+
+========================================
+"""
+
+# Save report
+with open('../reports/eda_summary_report.txt', 'w') as f:
+    f.write(summary_report)
+
+print(summary_report)
+print("\n✅ Saved: reports/eda_summary_report.txt")
