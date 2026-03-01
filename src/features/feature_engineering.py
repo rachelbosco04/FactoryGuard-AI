@@ -277,13 +277,13 @@ def main():
     # Load cleaned data (if available) or raw data
     try:
         print("\nAttempting to load cleaned data...")
-        train_df = pd.read_csv('../../data/processed/train_cleaned.csv')
-        test_df = pd.read_csv('../../data/processed/test_cleaned.csv')
+        train_df = pd.read_csv('data/processed/train_cleaned.csv')
+        test_df = pd.read_csv('data/processed/test_cleaned.csv')
         print("✅ Loaded cleaned data")
     except FileNotFoundError:
         print("⚠️  Cleaned data not found, loading raw data...")
-        train_df = pd.read_csv('../../data/raw/train_data.csv')
-        test_df = pd.read_csv('../../data/raw/test_data.csv')
+        train_df = pd.read_csv('data/raw/train_data.csv')
+        test_df = pd.read_csv('data/raw/test_data.csv')
         print("✅ Loaded raw data")
     
     print(f"\nTrain shape: {train_df.shape}")
