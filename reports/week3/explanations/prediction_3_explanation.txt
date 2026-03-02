@@ -1,0 +1,43 @@
+PREDICTION EXPLANATION #3
+============================================================
+
+Final Prediction Score: 0.1428
+(Base risk: 0.5714)
+
+TOP CONTRIBUTING FACTORS:
+------------------------------------------------------------
+
+1. tool_wear_rate_of_change
+   Value: 0.0003
+   Deviation: near baseline (0.00)
+   Impact: decreases failure risk
+   SHAP value: -0.0381
+
+2. tool_wear_rolling_std_6h
+   Value: 0.0031
+   Deviation: below baseline (0.01)
+   Impact: decreases failure risk
+   SHAP value: -0.0341
+
+3. hydraulic_pressure_rolling_mean_24h
+   Value: 150.0973
+   Deviation: near baseline (149.99)
+   Impact: decreases failure risk
+   SHAP value: -0.0341
+
+4. motor_current_rolling_max_6h
+   Value: 11.9451
+   Deviation: below baseline (12.26)
+   Impact: decreases failure risk
+   SHAP value: -0.0277
+
+5. hydraulic_pressure_ema_0.1
+   Value: 150.4179
+   Deviation: near baseline (149.99)
+   Impact: decreases failure risk
+   SHAP value: -0.0255
+
+============================================================
+HUMAN-READABLE EXPLANATION:
+------------------------------------------------------------
+tool wear rate of change = 0.00 (near baseline (0.00)) decreases failure risk; tool wear rolling std 6h = 0.00 (below baseline (0.01)) decreases failure risk; hydraulic pressure rolling mean 24h = 150.10 (near baseline (149.99)) decreases failure risk

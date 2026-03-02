@@ -1,0 +1,27 @@
+SHAP EXPLANATION SUMMARY REPORT
+======================================================================
+
+Total Predictions Analyzed: 10
+
+MOST FREQUENTLY IMPORTANT FEATURES:
+----------------------------------------------------------------------
+ 1. tool_wear_rate_of_change                           (appeared in 10/10 predictions)
+ 2. tool_wear_rolling_std_6h                           (appeared in 10/10 predictions)
+ 3. hydraulic_pressure_rolling_mean_24h                (appeared in 10/10 predictions)
+ 4. motor_current_rolling_max_6h                       (appeared in 10/10 predictions)
+ 5. hydraulic_pressure_ema_0.1                         (appeared in 10/10 predictions)
+
+======================================================================
+SAMPLE EXPLANATIONS:
+----------------------------------------------------------------------
+
+1. tool wear rate of change = -0.01 (below baseline (0.00)) decreases failure risk; tool wear rolling std 6h = 0.01 (significantly exceeds baseline (0.01)) decreases failure risk; hydraulic pressure rolling mean 24h = 148.35 (near baseline (149.99)) decreases failure risk
+
+2. tool wear rate of change = 0.01 (exceeds baseline (0.00)) decreases failure risk; tool wear rolling std 6h = 0.00 (near baseline (0.01)) decreases failure risk; hydraulic pressure rolling mean 24h = 148.26 (below baseline (149.99)) decreases failure risk
+
+3. tool wear rate of change = 0.00 (near baseline (0.00)) decreases failure risk; tool wear rolling std 6h = 0.00 (below baseline (0.01)) decreases failure risk; hydraulic pressure rolling mean 24h = 150.10 (near baseline (149.99)) decreases failure risk
+
+4. tool wear rate of change = -0.01 (below baseline (0.00)) decreases failure risk; tool wear rolling std 6h = 0.00 (near baseline (0.01)) decreases failure risk; hydraulic pressure rolling mean 24h = 152.13 (exceeds baseline (149.99)) decreases failure risk
+
+5. tool wear rate of change = 0.00 (near baseline (0.00)) decreases failure risk; tool wear rolling std 6h = 0.01 (exceeds baseline (0.01)) decreases failure risk; hydraulic pressure rolling mean 24h = 149.13 (near baseline (149.99)) decreases failure risk
+
