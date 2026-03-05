@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FactoryGuard AI - Predictive Maintenance</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+background:linear-gradient(135deg,#5f4050 0%,#cf6992 100%);
+min-height:100vh;
+padding:20px;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+.container{
+max-width:600px;
+width:100%;
+}
+
+.header{
+text-align:center;
+color:rgb(255, 255, 255);
+margin-bottom:40px;
+}
+
+.logo{
+font-size:3em;
+margin-bottom:10px;
+}
+
+.title{
+font-size:2.5em;
+font-weight:700;
+margin-bottom:10px;
+letter-spacing:-1px;
+}
+
+.subtitle{
+font-size:1.1em;
+opacity:.9;
+}
+
+.card{
+background:white;
+border-radius:18px;
+padding:35px;
+box-shadow:0 20px 60px rgba(0,0,0,.3);
+}
+
+.status-grid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:15px;
+margin-bottom:35px;
+}
+
+.status-item{
+text-align:center;
+padding:20px;
+border-radius:12px;
+color:white;
+}
+
+.green{background:#36896c;}
+.blue{background:#4b648f;}
+.purple{background:#5e4b80;}
+
+.status-icon{
+font-size:2em;
+margin-bottom:5px;
+}
+
+/* SENSOR INPUTS */
+
+.sensor-input{
+margin-bottom:22px;
+}
+
+.sensor-label{
+font-weight:600;
+color:#171c25;
+margin-bottom:8px;
+display:block;
+}
+
+.sensor-value-box{
+display:flex;
+align-items:center;
+background:#f9fafb;
+border:2px solid #d1d4db;
+border-radius:10px;
+padding:14px 55px 14px 18px;
+font-size:1.3em;
+font-weight:600;
+color:#1f2937;
+position:relative;
+}
+
+.sensor-value-box input{
+width:100%;
+border:none;
+background:transparent;
+font-size:1.3em;
+font-weight:600;
+outline:none;
+color:#1f2937;
+}
+
+.arrow-controls{
+position:absolute;
+right:10px;
+top:50%;
+transform:translateY(-50%);
+display:flex;
+flex-direction:column;
+opacity:0;
+transition:.2s;
+}
+
+.sensor-value-box:hover .arrow-controls{
+opacity:1;
+}
+
+.arrow-btn{
+width:18px;
+height:14px;
+border:none;
+background:none;
+font-size:10px;
+cursor:pointer;
+color:#9ca3af;
+}
+
+.arrow-btn:hover{
+color:#667eea;
+}
+
+/* BUTTONS */
+
+.button-row{
+display:flex;
+gap:15px;
+margin-top:25px;
+}
+
+.button-row button{
+flex:1;
+font-family:inherit;
+font-size:1.1em;
+font-weight:700;
+}
+
+.predict-btn{
+padding:18px;
+background:linear-gradient(135deg,#3a5a8d 0%,#4c3582 100%);
+color:white;
+border:none;
+border-radius:14px;
+cursor:pointer;
+}
+
+.reset-btn{
+padding:18px;
+background:#545a67;
+color:white;
+border:none;
+border-radius:14px;
+cursor:pointer;
+}
+
+/* RESULT */
+
+.result-box{
+display:none;
+margin-top:25px;
+padding:25px;
+border-radius:12px;
+font-weight:600;
+position:relative;
+}
+
+.result-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:10px;
+}
+
+.result-header h3{
+font-size:1.2em;
+font-weight:700;
+}
+
+.result-box.low{
+background:#d1fae5;
+border:3px solid #10b981;
+color:#065f46;
+}
+
+.result-box.medium{
+background:#fef3c7;
+border:3px solid #f59e0b;
+color:#78350f;
+}
+
+.result-box.high{
+background:#fee2e2;
+border:3px solid #ef4444;
+color:#7f1d1d;
+}
+
+.probability{
+font-size:2.5em;
+font-weight:700;
+margin:10px 0;
+}
+
+/* RISK BADGE */
+
+.risk-badge{
+position:absolute;
+top:20px;
+right:20px;
+padding:6px 14px;
+border-radius:20px;
+font-size:.8em;
+font-weight:700;
+color:white;
+}
+
+.low-badge{background:#22c55e;}
+.medium-badge{background:#f59e0b;}
+.high-badge{background:#ef4444;}
+
+.loading{
+display:none;
+text-align:center;
+padding:20px;
+}
+
+.spinner{
+border:4px solid #f3f4f6;
+border-top:4px solid #667eea;
+border-radius:50%;
+width:50px;
+height:50px;
+margin:0 auto 10px;
+animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+0%{transform:rotate(0deg)}
+100%{transform:rotate(360deg)}
+}
+
+/* FOOTER */
+
+.footer{
+margin-top:15px;
+text-align:center;
+font-size:.9em;
+color:#6b7280;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+<div class="title">🏭 FactoryGuard-AI</div>
+<div class="subtitle">CNC Machine Predictive Maintenance System</div>
+</div>
+
+<div class="card">
+
+<div class="status-grid">
+<div class="status-item green"><div class="status-icon">✓</div>API Online</div>
+<div class="status-item blue"><div class="status-icon">🤖</div>LightGBM Model</div>
+<div class="status-item purple"><div class="status-icon">⚡</div>Fast Response</div>
+</div>
+
+<!-- SENSOR INPUTS -->
+
+<div class="sensor-input">
+<label class="sensor-label">Spindle Temperature (°C)</label>
+<div class="sensor-value-box">
+<span id="temperature">45.2</span>
+<div class="arrow-controls">
+<button class="arrow-btn" onclick="incrementValue('temperature')" onmousedown="startHold('temperature','up')" onmouseup="stopHold()" onmouseleave="stopHold()">▲</button>
+<button class="arrow-btn" onclick="decrementValue('temperature')" onmousedown="startHold('temperature','down')" onmouseup="stopHold()" onmouseleave="stopHold()">▼</button>
+</div>
+</div>
+</div>
+
+<div class="sensor-input">
+<label class="sensor-label">Spindle Vibration (mm/s)</label>
+<div class="sensor-value-box">
+<span id="vibration">2.0</span>
+<div class="arrow-controls">
+<button class="arrow-btn" onclick="incrementValue('vibration')" onmousedown="startHold('vibration','up')" onmouseup="stopHold()" onmouseleave="stopHold()">▲</button>
+<button class="arrow-btn" onclick="decrementValue('vibration')" onmousedown="startHold('vibration','down')" onmouseup="stopHold()" onmouseleave="stopHold()">▼</button>
+</div>
+</div>
+</div>
+
+<div class="sensor-input">
+<label class="sensor-label">Spindle Pressure (bar)</label>
+<div class="sensor-value-box">
+<span id="pressure">6.0</span>
+<div class="arrow-controls">
+<button class="arrow-btn" onclick="incrementValue('pressure')" onmousedown="startHold('pressure','up')" onmouseup="stopHold()" onmouseleave="stopHold()">▲</button>
+<button class="arrow-btn" onclick="decrementValue('pressure')" onmousedown="startHold('pressure','down')" onmouseup="stopHold()" onmouseleave="stopHold()">▼</button>
+</div>
+</div>
+</div>
+
+<div class="sensor-input">
+<label class="sensor-label">Tool Wear (%)</label>
+<div class="sensor-value-box">
+<span id="toolwear">15.0</span>
+<div class="arrow-controls">
+<button class="arrow-btn" onclick="incrementValue('toolwear')" onmousedown="startHold('toolwear','up')" onmouseup="stopHold()" onmouseleave="stopHold()">▲</button>
+<button class="arrow-btn" onclick="decrementValue('toolwear')" onmousedown="startHold('toolwear','down')" onmouseup="stopHold()" onmouseleave="stopHold()">▼</button>
+</div>
+</div>
+</div>
+
+<div class="button-row">
+<button class="predict-btn" onclick="predictFailure()">🔮 Predict Failure Risk</button>
+<button class="reset-btn" onclick="resetToDefaults()">🔄 Reset to Defaults</button>
+</div>
+
+<div class="loading" id="loading">
+<div class="spinner"></div>
+Analyzing sensor data...
+</div>
+
+<div class="result-box" id="result">
+
+<div class="result-header">
+<h3>Failure Probability</h3>
+<div id="riskBadge" class="risk-badge low-badge">LOW</div>
+</div>
+
+<div class="probability" id="probability"></div>
+<div id="message"></div>
+
+</div>
+
+<div class="footer" id="footer"></div>
+
+</div>
+</div>
+
+<script>
+
+const defaults={temperature:45.2,vibration:2.0,pressure:6.0,toolwear:15.0}
+const steps={temperature:1,vibration:.1,pressure:.5,toolwear:1}
+
+function incrementValue(sensor){
+let el=document.getElementById(sensor)
+let val=parseFloat(el.textContent)
+val+=steps[sensor]
+el.textContent=val.toFixed(1)
+}
+
+function decrementValue(sensor){
+let el=document.getElementById(sensor)
+let val=parseFloat(el.textContent)
+val-=steps[sensor]
+el.textContent=val.toFixed(1)
+}
+
+function resetToDefaults(){
+for(const key in defaults){
+document.getElementById(key).textContent=defaults[key]
+}
+document.getElementById("result").style.display="none"
+document.getElementById("footer").textContent=""
+}
+
+let holdInterval=null
+
+function startHold(sensor,direction){
+holdInterval=setInterval(()=>{
+direction==="up"?incrementValue(sensor):decrementValue(sensor)
+},80)
+}
+
+function stopHold(){
+clearInterval(holdInterval)
+}
+
+async function predictFailure(){
+
+const payload={
+sensors:{
+spindle_temp:parseFloat(temperature.textContent),
+spindle_vibration:parseFloat(vibration.textContent)/10,
+spindle_speed:3000,
+motor_current:12.5,
+tool_vibration:parseFloat(vibration.textContent)/20,
+tool_wear:parseFloat(toolwear.textContent)/100,
+cutting_force:150,
+hydraulic_pressure:parseFloat(pressure.textContent)*8.33,
+coolant_flow:5,
+coolant_temp:25,
+acoustic_emission:.05,
+power_consumption:2.5,
+feed_rate:500,
+ambient_temp:22,
+ambient_humidity:45
+}
+}
+
+loading.style.display="block"
+
+try{
+
+const response=await fetch("http://127.0.0.1:5000/predict",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify(payload)
+})
+
+const data=await response.json()
+
+loading.style.display="none"
+
+const probabilityPercent=(data.failure_probability*100).toFixed(4)
+const rawProbability=data.failure_probability.toFixed(6)
+
+probability.textContent=probabilityPercent+"%"
+
+const badge=document.getElementById("riskBadge")
+
+if(data.failure_probability>0.35){
+
+result.className="result-box high"
+badge.textContent="HIGH"
+badge.className="risk-badge high-badge"
+
+message.innerHTML="⚠ High failure risk detected. Schedule maintenance immediately."
+
+}
+else if(data.failure_probability>0.15){
+
+result.className="result-box medium"
+badge.textContent="MEDIUM"
+badge.className="risk-badge medium-badge"
+
+message.innerHTML="⚠ Medium failure risk detected. Maintenance recommended."
+
+}
+else{
+
+result.className="result-box low"
+badge.textContent="LOW"
+badge.className="risk-badge low-badge"
+
+message.innerHTML="✓ Machine operating normally. No immediate action required."
+
+}
+
+result.style.display="block"
+
+footer.textContent=`Raw Model Output: ${rawProbability} | Response Time: ${data.response_time_ms} ms`
+
+}catch(e){
+
+loading.style.display="none"
+alert("Could not connect to API.\nRun: python app.py")
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
