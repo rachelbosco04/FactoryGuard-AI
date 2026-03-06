@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import shap
 import time
@@ -56,15 +56,14 @@ def load_model_safe():
         return False
 
 
-@app.route('/')
-def home():
-    """Health check endpoint"""
-    return jsonify({
-        'status': 'online',
-        'service': 'Predictive Maintenance API',
-        'model_loaded': model_loaded,
-        'error': error_message if not model_loaded else None
-    })
+# 🔹 LOAD MODEL WHEN SERVER STARTS (important for Render/Gunicorn)
+load_model_safe()
+
+
+@app.route("/")
+def dashboard():
+    """Serve Dashboard UI"""
+    return send_from_directory(".", "Dashboard.html")
 
 
 @app.route('/health', methods=['GET'])
@@ -146,8 +145,6 @@ def predict():
         prediction_proba = model.predict(features_2d)
         failure_probability = float(prediction_proba[0])
 
-        print("Failure probability:", failure_probability)
-
         # SHAP Explainability
         shap_values = explainer.shap_values(features_2d)
 
@@ -187,12 +184,6 @@ if __name__ == '__main__':
     print("\n" + "=" * 70)
     print("STARTING FLASK API")
     print("=" * 70)
-
-    success = load_model_safe()
-
-    if not success:
-        print("\n⚠️ WARNING: Model failed to load!")
-        print(f"Error: {error_message}")
 
     print("\n🚀 API running at: http://localhost:5000")
     print("=" * 70 + "\n")
