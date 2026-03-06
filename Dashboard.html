@@ -443,7 +443,12 @@ headers:{"Content-Type":"application/json"},
 body:JSON.stringify(payload)
 })
 
-const data=await response.json()
+if(!response.ok){
+const errorText = await response.text()
+throw new Error(errorText)
+}
+
+const data = await response.json()
 
 loading.style.display="none"
 
@@ -489,12 +494,12 @@ footer.textContent=`Raw Model Output: ${rawProbability} | Response Time: ${data.
 }catch(e){
 
 loading.style.display="none"
-alert("Could not connect to API.\nRun: python app.py")
+console.error("API error:",e)
+alert("API Error: "+e.message)
 
 }
 
 }
-
 </script>
 
 </body>
