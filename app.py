@@ -19,39 +19,40 @@ error_message = None
 def load_model_safe():
     """Safely load model with proper error handling"""
     global model, explainer, model_loaded, error_message
-    
-    print("="*70)
+
+    print("=" * 70)
     print("LOADING MODEL")
-    print("="*70)
-    
+    print("=" * 70)
+
     try:
-        import lightgbm as lgb
         import numpy as np
-        
+        import lightgbm as lgb
+
         MODEL_PATH = "models/lightgbm_booster.txt"
-        
+
         if not os.path.exists(MODEL_PATH):
             error_message = f"Model file not found: {MODEL_PATH}"
             print(f"❌ {error_message}")
             return False
-        
-        # Load model
+
+        # Load LightGBM Booster model
         model = lgb.Booster(model_file=MODEL_PATH)
 
         # Create SHAP explainer
         explainer = shap.TreeExplainer(model)
 
         model_loaded = True
-        
-        print("✅ LightGBM Booster model loaded successfully")
+
+        print("✅ LightGBM model loaded successfully")
         print("✅ SHAP explainer initialized")
-        print("="*70)
+        print("=" * 70)
+
         return True
-        
+
     except Exception as e:
         error_message = f"Error loading model: {str(e)}"
         print(f"❌ {error_message}")
-        print("="*70)
+        print("=" * 70)
         return False
 
 
@@ -78,33 +79,31 @@ def health():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    """Prediction endpoint with safety checks"""
-    
+
     if not model_loaded:
         return jsonify({
             'error': 'Model not loaded. ' + (error_message or 'Unknown error'),
             'status': 'error'
         }), 503
-    
+
     start_time = time.time()
-    
+
     try:
         import numpy as np
-        
+
         data = request.get_json()
-        
+
         if not data or 'sensors' not in data:
             return jsonify({
                 'error': 'Missing sensors data',
                 'status': 'error'
             }), 400
-        
+
         sensors = data['sensors']
-        
+
         # Create feature array
         feature_array = np.zeros(154, dtype=np.float32)
-        
-        # Map sensors to features
+
         sensor_mapping = {
             'spindle_temp': 0,
             'spindle_vibration': 1,
@@ -122,8 +121,7 @@ def predict():
             'ambient_temp': 13,
             'ambient_humidity': 14
         }
-        
-        # Fill sensor values
+
         for sensor_name, sensor_value in sensors.items():
             if sensor_name in sensor_mapping:
                 try:
@@ -132,8 +130,7 @@ def predict():
                 except:
                     pass
 
-        # ----- FEATURE ENGINEERING -----
-
+        # Feature Engineering
         spindle_temp = feature_array[0]
         spindle_vibration = feature_array[1]
         tool_wear = feature_array[5]
@@ -144,21 +141,16 @@ def predict():
         feature_array[18] = spindle_vibration * tool_wear
         feature_array[19] = spindle_temp - 25
 
-        # Reshape for prediction
         features_2d = feature_array.reshape(1, -1)
-        
-        # Prediction
+
         prediction_proba = model.predict(features_2d)
         failure_probability = float(prediction_proba[0])
 
-        # Debug print
         print("Failure probability:", failure_probability)
 
-        # ----- SHAP EXPLAINABILITY -----
-
+        # SHAP Explainability
         shap_values = explainer.shap_values(features_2d)
 
-        # Get top contributing features
         shap_importance = list(zip(range(len(shap_values[0])), shap_values[0]))
         shap_importance = sorted(shap_importance, key=lambda x: abs(x[1]), reverse=True)[:5]
 
@@ -168,21 +160,21 @@ def predict():
         ]
 
         response_time_ms = (time.time() - start_time) * 1000
-        
+
         response = {
             'failure_probability': round(failure_probability, 6),
             'prediction': "failure" if failure_probability > 0.15 else "normal",
             'confidence': round(
                 1 - failure_probability if failure_probability < 0.5 else failure_probability, 4
             ),
-            'top_feature_impacts': top_features,   # SHAP explainability
+            'top_feature_impacts': top_features,
             'response_time_ms': round(response_time_ms, 2),
             'timestamp': datetime.now().isoformat(),
             'status': 'success'
         }
-        
+
         return jsonify(response), 200
-    
+
     except Exception as e:
         return jsonify({
             'error': f'Request error: {str(e)}',
@@ -192,17 +184,17 @@ def predict():
 
 
 if __name__ == '__main__':
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("STARTING FLASK API")
-    print("="*70)
-    
+    print("=" * 70)
+
     success = load_model_safe()
-    
+
     if not success:
-        print("\n⚠️  WARNING: Model failed to load!")
+        print("\n⚠️ WARNING: Model failed to load!")
         print(f"Error: {error_message}")
-    
+
     print("\n🚀 API running at: http://localhost:5000")
-    print("="*70 + "\n")
-    
+    print("=" * 70 + "\n")
+
     app.run(host='0.0.0.0', port=5000, debug=False, threaded=True)

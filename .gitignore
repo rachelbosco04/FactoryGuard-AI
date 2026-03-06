@@ -82,3 +82,5 @@ htmlcov/
 .coverage.*
 coverage.xml
 *.cover
+
+models/*.txt text eol=lf
