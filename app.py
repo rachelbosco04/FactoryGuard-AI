@@ -146,7 +146,11 @@ def predict():
         failure_probability = float(prediction_proba[0])
 
         # SHAP Explainability
-        shap_values = explainer.shap_values(features_2d)
+        try:
+            shap_values = explainer.shap_values(features_2d)
+        except Exception as e:
+            print("SHAP error:", e)
+            shap_values = [[0]*154]
 
         shap_importance = list(zip(range(len(shap_values[0])), shap_values[0]))
         shap_importance = sorted(shap_importance, key=lambda x: abs(x[1]), reverse=True)[:5]
@@ -185,7 +189,9 @@ if __name__ == '__main__':
     print("STARTING FLASK API")
     print("=" * 70)
 
-    print("\n🚀 API running at: http://localhost:5000")
+    port = int(os.environ.get("PORT", 5000))
+
+    print(f"\n🚀 API running at: http://localhost:{port}")
     print("=" * 70 + "\n")
 
-    app.run(host='0.0.0.0', port=5000, debug=False, threaded=True)
+    app.run(host='0.0.0.0', port=port, debug=False, threaded=True)
